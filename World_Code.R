@@ -386,7 +386,7 @@ ShapleyWorld$Var <- case_when(ShapleyWorld$Var == "PopContribution" ~ "Pop",
                               ShapleyWorld$Var == "EnergryContribution" ~ "Energy Intensity",
                               T ~ "Carbon Intensity")
 
-# Plot: historical chart + SSP scenarios
+# Plot Shapley decomposition: historical chart + SSP scenarios
 
 dir.create("output/figures/World")
 
@@ -502,7 +502,7 @@ ShapleyWorldSnapshot <- group_by(ShapleyWorldSnapshot, Period, Year) %>%
 ShapleyWorldSnapshot$Year <- case_when(ShapleyWorldSnapshot$Year == 2020 ~ "1970-2020",
                                        T ~ "2020-2100")
 #export data for table and charts for the WP
-write.csv(ShapleyWorldSnapshot, "Output/Shapley Decomposition by historical and SSP.csv")
+write.csv(ShapleyWorldSnapshot, "output/tables/world/historical_vs_ssp.csv")
 
 ################################################################################################
 
@@ -784,11 +784,11 @@ ggplot(Chart[Chart$Period == "Historical",]) +
         legend.position = "bottom",
         panel.grid.minor = element_blank()) +
   scale_color_manual(name=NULL,
-                     values = c("CO2 Emission" = IMF.Black,
-                                "GDP Per Capita" = IMF.Blue,
-                                "Energy Intensity" = IMF.Orange,
-                                "Population" = IMF.Purple,
-                                "Carbon Intensity" = IMF.Green)) +
+                     values = c("CO2 Emission" = "black",
+                                "GDP Per Capita" = "blue",
+                                "Energy Intensity" = "orange",
+                                "Population" = "purple",
+                                "Carbon Intensity" = "green")) +
   scale_fill_manual(name=NULL,
                     values = c()) +
   ggtitle("Kaya identity: drivers of CO2 emissions", subtitle = "(Base year = 1965)")
@@ -807,11 +807,11 @@ ggplot(Chart[Chart$Period %in% c("Historical", "SSP5-Baseline"),]) +
         legend.position = "bottom",
         panel.grid.minor = element_blank()) +
   scale_color_manual(name=NULL,
-                     values = c("CO2 Emission" = IMF.Black,
-                                "GDP Per Capita" = IMF.Blue,
-                                "Energy Intensity" = IMF.Orange,
-                                "Population" = IMF.Purple,
-                                "Carbon Intensity" = IMF.Green)) +
+                     values = c("CO2 Emission" = "black",
+                                "GDP Per Capita" = "blue",
+                                "Energy Intensity" = "orange",
+                                "Population" = "purple",
+                                "Carbon Intensity" = "green")) +
   scale_fill_manual(name=NULL,
                     values = c()) +
   ggtitle("Kaya identity: drivers of CO2 emissions", subtitle = "(Base year = 1965)") +
