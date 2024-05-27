@@ -819,6 +819,11 @@ ShapleyWorldSnapshot %>%
                subtitle = "(Contribution to CO2 Emission Growth)") +
        scale_fill_manual(values = c("#099ec8","#84bc41","#f9c416","#9cd8e9"))
 
+ggsave("output/figures/OECD-non/summary.png",
+       width = 10,
+       height = 6,
+       dpi = "retina")
+
 #change Year to period
 # ShapleyWorldSnapshot$Year <- case_when(ShapleyWorldSnapshot$Year == 2020 ~ "1970-2020",
 #                                        T ~ "2020-2100")
