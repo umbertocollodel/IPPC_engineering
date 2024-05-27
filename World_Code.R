@@ -664,7 +664,6 @@ ShapleyWorld <- group_by(ShapleyWorld, REGION, SCENARIO, Year) %>%
 
 ShapleyWorld <- pivot_longer(ShapleyWorld, PopContribution:CarbonContribution, names_to = "Var", values_to = "Value")
 
-unique(ShapleyWorld$Var)
 ShapleyWorld$Var <- case_when(ShapleyWorld$Var == "PopContribution" ~ "Pop",
                               ShapleyWorld$Var == "IncContribution" ~ "Income",
                               ShapleyWorld$Var == "EnergryContribution" ~ "Energy Intensity",
@@ -679,13 +678,14 @@ dir.create("output/figures/OECD-non")
 
 
 
-world_kaya_plots <- ShapleyWorld %>% 
+oecd_kaya_plots <- ShapleyWorld %>%
   split(.$SCENARIO) %>% 
 #  map(~ rbind(ShapleyWorld_hist,.x)) %>% 
   imap(~ ggplot(.x) +
          geom_col(aes(x = Year, y = Value, fill = Var), width = 7, position = "stack") +
          geom_line(aes(x = Year, y = CO2Growth,col = "CO2 Growth"), size = 0.8) +
          geom_point(aes(x = Year, y = CO2Growth),col = "#a37c00", size = 2.5, alpha=0.3) +
+         facet_wrap(~ REGION) +
          theme_bw() + 
          theme(axis.title = element_blank(),
                text = element_text(size = 14),
@@ -711,8 +711,8 @@ world_kaya_plots <- ShapleyWorld %>%
 
 #Export: 
 
-world_kaya_plots %>% 
-  iwalk(~ ggsave(paste0("output/figures/World/",.y,".png"),
+oecd_kaya_plots %>% 
+  iwalk(~ ggsave(paste0("output/figures/OECD-non/",.y,".png"),
                  .x,
                  width = 10,
                  height = 6,
@@ -782,6 +782,42 @@ ShapleyWorldSnapshot <- group_by(ShapleyWorldSnapshot, REGION, SCENARIO, Year) %
             EnergryContribution = mean(EnergryContribution),
             CarbonContribution = mean(CarbonContribution),) %>% 
   ungroup()
+
+# From wide to long
+
+ShapleyWorldSnapshot <- pivot_longer(ShapleyWorldSnapshot, PopContribution:CarbonContribution, names_to = "Var", values_to = "Value")
+
+ShapleyWorldSnapshot$Var <- case_when(ShapleyWorldSnapshot$Var == "PopContribution" ~ "Pop",
+                              ShapleyWorldSnapshot$Var == "IncContribution" ~ "Income",
+                              ShapleyWorldSnapshot$Var == "EnergryContribution" ~ "Energy Intensity",
+                              T ~ "Carbon Intensity")
+
+
+# Plot:
+
+ShapleyWorldSnapshot %>%
+    mutate(REGION = case_when(REGION == "nonOECD" ~ "Non-OECD",
+                              T ~ REGION)) %>% 
+    mutate(REGION = factor(REGION,levels = c("OECD","Non-OECD"))) %>% 
+    ggplot() +
+       geom_col(aes(x = SCENARIO, y = Value, fill = Var), width = 0.5, position = "stack") +
+       facet_wrap(~ REGION) +
+       theme_bw() + 
+       theme(axis.title = element_blank(),
+             text = element_text(size = 14),
+             legend.position = "bottom",
+             panel.grid.minor = element_blank(), 
+             legend.title = element_blank(),
+             axis.text.x = element_text(angle = 90, hjust = 1)) +
+       # scale_fill_manual(name=NULL,
+       #                    values = c("CO2 Emission" = IMF.Black,
+       #                               "GDP Per Capita" = IMF.Blue,
+       #                               "Energy Intensity" = IMF.Orange,
+       #                               "Population" = IMF.Purple,
+       #                               "Carbon Intensity" = IMF.Green)) +
+       ggtitle("Kaya identity: drivers of CO2 emissions", 
+               subtitle = "(Contribution to CO2 Emission Growth)") +
+       scale_fill_manual(values = c("#099ec8","#84bc41","#f9c416","#9cd8e9"))
 
 #change Year to period
 # ShapleyWorldSnapshot$Year <- case_when(ShapleyWorldSnapshot$Year == 2020 ~ "1970-2020",
