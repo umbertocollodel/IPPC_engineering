@@ -201,7 +201,6 @@ WorldData$Period <- "Historical"
 ################################################################################################
 
 #add in SSP data
-names(WorldData)
 
 SSP <- read_csv("Data/SSP_IAM_V2_201811.csv")
 str(SSP)
@@ -241,7 +240,6 @@ WorldSSP$Population <- WorldSSP$Population * 1000
 WorldSSP$`GDP|PPP` <- WorldSSP$`GDP|PPP` * 1000
 WorldSSP$`Primary Energy` <- WorldSSP$`Primary Energy` * 1000
 
-names(WorldData)
 names(WorldSSP)
 
 ################################################################################################
