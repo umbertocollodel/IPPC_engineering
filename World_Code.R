@@ -660,19 +660,29 @@ ShapleyWorld <- group_by(ShapleyWorld, REGION, SCENARIO, Year) %>%
             CarbonContribution = mean(CarbonContribution),) %>% 
   ungroup()
 
+# From wide to long
+
+ShapleyWorld <- pivot_longer(ShapleyWorld, PopContribution:CarbonContribution, names_to = "Var", values_to = "Value")
+
+unique(ShapleyWorld$Var)
+ShapleyWorld$Var <- case_when(ShapleyWorld$Var == "PopContribution" ~ "Pop",
+                              ShapleyWorld$Var == "IncContribution" ~ "Income",
+                              ShapleyWorld$Var == "EnergryContribution" ~ "Energy Intensity",
+                              T ~ "Carbon Intensity")
+
 # Plot Shapley decomposition: OECD vs non-OECD (historical chart + SSP scenarios)
 
-dir.create("output/figures/World")
+dir.create("output/figures/OECD-non")
 
-ShapleyWorld_hist <- ShapleyWorld %>% 
-  filter(Period == "Historical")
+#ShapleyWorld_hist <- ShapleyWorld %>% 
+#  filter(Period == "Historical")
 
 
 
 world_kaya_plots <- ShapleyWorld %>% 
-  split(.$Period) %>% 
-  map(~ rbind(ShapleyWorld_hist,.x)) %>% 
-  imap(~ ggplot(.x[.x$Period %in% c("Historical", .y),]) +
+  split(.$SCENARIO) %>% 
+#  map(~ rbind(ShapleyWorld_hist,.x)) %>% 
+  imap(~ ggplot(.x) +
          geom_col(aes(x = Year, y = Value, fill = Var), width = 7, position = "stack") +
          geom_line(aes(x = Year, y = CO2Growth,col = "CO2 Growth"), size = 0.8) +
          geom_point(aes(x = Year, y = CO2Growth),col = "#a37c00", size = 2.5, alpha=0.3) +
