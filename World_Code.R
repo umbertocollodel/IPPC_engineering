@@ -509,7 +509,6 @@ write.csv(ShapleyWorldSnapshot, "output/tables/world/historical_vs_ssp.csv")
 ################################################################################################
 
 #add in SSP data
-names(WorldData)
 
 SSP <- read_csv("Data/SSP_IAM_V2_201811.csv")
 str(SSP)
@@ -575,7 +574,6 @@ nonOECDSSP$CarbonIntensity <- nonOECDSSP$`Emissions|CO2` / nonOECDSSP$`Primary E
 OECDSSP$REGION <- "OECD"
 WorldSSP <- rbind(OECDSSP, nonOECDSSP)
 
-names(WorldData)
 names(OECDSSP)
 
 ################################################################################################
@@ -662,8 +660,54 @@ ShapleyWorld <- group_by(ShapleyWorld, REGION, SCENARIO, Year) %>%
             CarbonContribution = mean(CarbonContribution),) %>% 
   ungroup()
 
-#export data for table and charts for the WP
-write.csv(ShapleyWorld, "Output/Shapley Decomposition.csv")
+# Plot Shapley decomposition: OECD vs non-OECD (historical chart + SSP scenarios)
+
+dir.create("output/figures/World")
+
+ShapleyWorld_hist <- ShapleyWorld %>% 
+  filter(Period == "Historical")
+
+
+
+world_kaya_plots <- ShapleyWorld %>% 
+  split(.$Period) %>% 
+  map(~ rbind(ShapleyWorld_hist,.x)) %>% 
+  imap(~ ggplot(.x[.x$Period %in% c("Historical", .y),]) +
+         geom_col(aes(x = Year, y = Value, fill = Var), width = 7, position = "stack") +
+         geom_line(aes(x = Year, y = CO2Growth,col = "CO2 Growth"), size = 0.8) +
+         geom_point(aes(x = Year, y = CO2Growth),col = "#a37c00", size = 2.5, alpha=0.3) +
+         theme_bw() + 
+         theme(axis.title = element_blank(),
+               text = element_text(size = 14),
+               legend.position = "bottom",
+               panel.grid.minor = element_blank(), 
+               legend.title = element_blank()) +
+         geom_hline(yintercept=0, size=0.5) +
+         geom_vline(xintercept = 2025, size=0.5) +
+         geom_text(y=100,x=2080, label=.y) +
+         # scale_fill_manual(name=NULL,
+         #                    values = c("CO2 Emission" = IMF.Black,
+         #                               "GDP Per Capita" = IMF.Blue,
+         #                               "Energy Intensity" = IMF.Orange,
+         #                               "Population" = IMF.Purple,
+         #                               "Carbon Intensity" = IMF.Green)) +
+         ggtitle("Kaya identity: drivers of CO2 emissions", 
+                 subtitle = "(Contribution to CO2 Emission Growth)") +
+         scale_x_continuous(n.breaks = 10) +
+         scale_fill_manual(values = c("#099ec8","#84bc41","#f9c416","#9cd8e9")) +
+         scale_color_manual(values = "#a37c00")
+  )
+
+
+#Export: 
+
+world_kaya_plots %>% 
+  iwalk(~ ggsave(paste0("output/figures/World/",.y,".png"),
+                 .x,
+                 width = 10,
+                 height = 6,
+                 dpi = "retina")
+  )
 
 
 #do the same as a snap shot
