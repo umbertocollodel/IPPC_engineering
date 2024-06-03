@@ -1,3 +1,9 @@
+# Script to compare graphically the evolution of the scenarios variables (kaya identity)
+# with the constructed historical to make sure they match
+
+
+# Plot all scenarios: -----
+
 df <- World %>% 
   filter(str_detect(Period,"Baseline|Historical")) %>% 
   summarise(`CarbonIntensity`= mean(`CarbonIntensity`,na.rm=T),
