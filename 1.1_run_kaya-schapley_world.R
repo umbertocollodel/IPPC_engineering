@@ -416,7 +416,7 @@ world_kaya_plots <- ShapleyWorld %>%
   #                               "Population" = IMF.Purple,
   #                               "Carbon Intensity" = IMF.Green)) +
   ggtitle("Kaya identity: drivers of CO2 emissions", 
-          subtitle = "(Contribution to CO2 Emission Growth)") +
+          subtitle = "(Contribution to CO2 Emission Growth, %)") +
   scale_x_continuous(n.breaks = 10) +
   scale_fill_manual(values = c("#099ec8","#84bc41","#f9c416","#9cd8e9")) +
   scale_color_manual(values = "#a37c00")
@@ -529,7 +529,7 @@ ShapleyWorldSnapshot %>%
   #                               "Population" = IMF.Purple,
   #                               "Carbon Intensity" = IMF.Green)) +
   ggtitle("Kaya identity: drivers of CO2 emissions", 
-          subtitle = "(Contribution to CO2 Emission Growth)") +
+          subtitle = "(Contribution to CO2 Emission Growth, %)") +
   scale_fill_manual(values = c("#099ec8","#84bc41","#f9c416","#9cd8e9"))
 
 # Export:
