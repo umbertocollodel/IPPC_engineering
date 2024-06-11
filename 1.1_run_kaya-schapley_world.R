@@ -433,6 +433,40 @@ world_kaya_plots %>%
                 dpi = "retina")
   )
 
+# All baselines scenarios in one plot:
+
+ShapleyWorld %>%
+  filter(str_detect(Period,"Historical|Baseline")) %>%
+  ggplot() +
+         geom_col(aes(x = Year, y = Value, fill = Var), width = 7, position = "stack") +
+         geom_line(aes(x = Year, y = CO2Growth,col = "CO2 Growth"), size = 0.8) +
+         geom_point(aes(x = Year, y = CO2Growth),col = "#a37c00", size = 2.5, alpha=0.3) +
+         theme_bw() + 
+         facet_wrap(~ Period, scales = "free_x") +
+         theme(axis.title = element_blank(),
+               text = element_text(size = 14),
+               legend.position = "bottom",
+               panel.grid.minor = element_blank(), 
+               legend.title = element_blank()) +
+         geom_hline(yintercept=0, size=0.5) +
+         # scale_fill_manual(name=NULL,
+         #                    values = c("CO2 Emission" = IMF.Black,
+         #                               "GDP Per Capita" = IMF.Blue,
+         #                               "Energy Intensity" = IMF.Orange,
+         #                               "Population" = IMF.Purple,
+         #                               "Carbon Intensity" = IMF.Green)) +
+         ggtitle("Kaya identity: drivers of CO2 emissions", 
+                 subtitle = "(Contribution to CO2 Emission Growth, %)") +
+         scale_x_continuous(n.breaks = 10) +
+         scale_fill_manual(values = c("#099ec8","#84bc41","#f9c416","#9cd8e9")) +
+         scale_color_manual(values = "#a37c00") +
+        theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+
+
+
+
+
+# Plot Shapley decomposition: historical chart + SSP scenario (average) ------
 
 #do the same as a snap shot
 #chart
@@ -541,6 +575,37 @@ ggsave("output/figures/World/summary.png",
 #export data for table and charts for the WP
 write.csv(ShapleyWorldSnapshot %>% pivot_wider(names_from =Var, values_from= Value),
           "output/tables/world/historical_vs_ssp.csv")
+
+# Plot: (only baseline!)
+
+ShapleyWorldSnapshot %>% 
+  filter(str_detect(Period,"Baseline|Historical")) %>% 
+  ggplot() +
+  geom_col(aes(x = Period, y = Value, fill = Var), width = 0.3, position = "stack") +
+  geom_vline(xintercept = 1.5, size=0.5) +
+  theme_bw() + 
+  theme(axis.title = element_blank(),
+        text = element_text(size = 14),
+        legend.position = "bottom",
+        panel.grid.minor = element_blank(), 
+        legend.title = element_blank(),
+        axis.text.x = element_text(angle = 90, hjust = 1)) +
+  # scale_fill_manual(name=NULL,
+  #                    values = c("CO2 Emission" = IMF.Black,
+  #                               "GDP Per Capita" = IMF.Blue,
+  #                               "Energy Intensity" = IMF.Orange,
+  #                               "Population" = IMF.Purple,
+  #                               "Carbon Intensity" = IMF.Green)) +
+  ggtitle("Kaya identity: drivers of CO2 emissions", 
+          subtitle = "(Contribution to CO2 Emission Growth, %)") +
+  scale_fill_manual(values = c("#099ec8","#84bc41","#f9c416","#9cd8e9"))
+
+# Export:
+
+ggsave("output/figures/World/summary_baseline.png",
+       width = 10,
+       height = 6,
+       dpi = "retina")
 
 
 
